@@ -26,6 +26,7 @@ export class LoginComponent implements OnInit {
       respuesta => {
         this.message="Hola, "+ this.name
         this.loginCorrecto=true
+        sessionStorage.setItem("player", this.name!)
       },
       error=>{
         this.loginCorrecto=false
@@ -34,6 +35,7 @@ export class LoginComponent implements OnInit {
     )
   }
   requestGame(){
+    console.log(sessionStorage.getItem("player"))
     this.gamesService.requestGame()
   }
 }

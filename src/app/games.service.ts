@@ -6,9 +6,36 @@ import { Injectable } from '@angular/core';
 })
 export class GamesService {
 
+  private ws?: WebSocket
   constructor(private httpClient:HttpClient) { }
 
   requestGame(){
+    this.httpClient.get<any>("http://localhost:80/games/requestGame?juego=nm&player=" + sessionStorage.getItem("player"))
+      .subscribe(respuesta =>{
+        sessionStorage.setItem("idMatch", respuesta.id)
+        console.log(respuesta)
+        this.prepareWebSocket()
+      }, error =>{
+        console.log(error)
+      }
+      )
+  }
+  prepareWebSocket(){
+    this.ws=new WebSocket("ws://localhost/wsGames")
+    this.ws.onopen = function(){
+      console.log("WS abierto")
+    }
+
+    this.ws.onmessage = function(event){
+      console.log("Mensaje recibido: " + JSON.stringify(event.data))
+    }
+
+    this.ws.onclose = function(){
+      console.log("WS cerrado")
+    }
+    this.ws.onerror = function(event){
+      console.log("WS error: " + JSON.stringify(event))
+    }
     
   }
 }
