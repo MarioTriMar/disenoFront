@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -7,18 +8,12 @@ import { Injectable } from '@angular/core';
 export class GamesService {
 
   private ws?: WebSocket
-  constructor(private httpClient:HttpClient) { }
+  constructor(private httpClient:HttpClient, private router:Router) { }
 
   requestGame(){
-    this.httpClient.get<any>("http://localhost:80/games/requestGame?juego=nm&player=" + sessionStorage.getItem("player"))
-      .subscribe(respuesta =>{
-        sessionStorage.setItem("idMatch", respuesta.id)
-        console.log(respuesta)
-        this.prepareWebSocket()
-      }, error =>{
-        console.log(error)
-      }
-      )
+
+    return this.httpClient.get<any>("http://localhost:80/games/requestGame?juego=nm&player=" + sessionStorage.getItem("player"));
+    
   }
   prepareWebSocket(){
     this.ws=new WebSocket("ws://localhost/wsGames")

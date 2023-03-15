@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { RegisterComponent } from './register/register.component';
 import { FormsModule } from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
-import { LoginComponent } from './login/login.component'
+import { LoginComponent } from './login/login.component';
+import { MatchComponent } from './match/match.component'
 @NgModule({
   declarations: [
     AppComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    MatchComponent
   ],
   imports: [
     BrowserModule,
