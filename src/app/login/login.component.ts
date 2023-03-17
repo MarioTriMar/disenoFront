@@ -26,6 +26,8 @@ export class LoginComponent implements OnInit {
       respuesta => {
         this.message="Hola, "+ this.name
         this.loginCorrecto=true
+        console.log((respuesta.httpSessionId))
+        sessionStorage.setItem("httpSessionId", respuesta.httpSessionId!)
         sessionStorage.setItem("player", this.name!)
       },
       error=>{

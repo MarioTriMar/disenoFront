@@ -17,6 +17,6 @@ export class AccountService {
     })
   }
   login(info:any):Observable<any>{
-    return this.httpClient.put("http://localhost:80/users/login",info)
+    return this.httpClient.put<any>("http://localhost:80/users/login",info)
   }
 }

@@ -21,7 +21,8 @@ export class GamesService {
       )
   }
   prepareWebSocket(){
-    this.ws=new WebSocket("ws://localhost/wsGames")
+    this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+
+      sessionStorage.getItem("httpSessionId"))
     this.ws.onopen = function(){
       console.log("WS abierto")
     }
