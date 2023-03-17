@@ -1,0 +1,22 @@
+<p>match works!</p>
+
+
+<div>
+    <button class="btn btn-success" (click)="requestGame()">Jugar</button>
+</div>
+
+<table class="table table-bordered border-primary table-hover">
+    <tbody>
+        <tr *ngFor="let row of matriz">
+            <td *ngFor="let num of row">{{num}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="table table-bordered border-primary table-hover">
+    <tbody>
+        <tr *ngFor="let row of matriz_0">
+            <td *ngFor="let num of row">{{num}}</td>
+        </tr>
+    </tbody>
+</table>

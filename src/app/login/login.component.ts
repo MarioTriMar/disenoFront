@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AccountService } from '../account.service';
 import { GamesService } from '../games.service';
 
@@ -8,12 +9,11 @@ import { GamesService } from '../games.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  name?: string = "Pepe"
-  pwd?: string = "123"
+  name?: string = "Ana"
+  pwd?: string = "ana123"
   message?: string
-  loginCorrecto:boolean = false
 
-  constructor(private accountService : AccountService, private gamesService:GamesService) { }
+  constructor(private router:Router, private accountService : AccountService, private gamesService:GamesService) { }
 
   ngOnInit(): void {
   }
@@ -25,19 +25,19 @@ export class LoginComponent implements OnInit {
     this.accountService.login(info).subscribe(
       respuesta => {
         this.message="Hola, "+ this.name
-        this.loginCorrecto=true
         console.log((respuesta.httpSessionId))
         sessionStorage.setItem("httpSessionId", respuesta.httpSessionId!)
         sessionStorage.setItem("player", this.name!)
+        this.router.navigate(['/match'])
       },
       error=>{
-        this.loginCorrecto=false
         this.message="Ha habido un error"
       }
     )
   }
-  requestGame(){
-    console.log(sessionStorage.getItem("player"))
-    this.gamesService.requestGame()
+
+  register(){
+    this.router.navigate(['/register'])
   }
+  
 }

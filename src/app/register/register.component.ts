@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AccountService } from '../account.service';
 
 @Component({
@@ -13,7 +14,7 @@ export class RegisterComponent implements OnInit {
   pwd1?: string
   pwd2?: string
 
-  constructor(private accountService : AccountService) { 
+  constructor(private accountService : AccountService, private router:Router) { 
     this.email="pepe@pepe.com"
   }
  
@@ -28,5 +29,6 @@ export class RegisterComponent implements OnInit {
       pwd2:this.pwd2
     }
     this.accountService.register(info)
+    this.router.navigate(['/login'])
   }
 }
