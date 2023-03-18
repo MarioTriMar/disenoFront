@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoginComponent } from './login/login.component';
+import { MatchComponent } from './match/match.component';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +26,11 @@ export class GamesService {
 
     this.ws.onmessage = function(event){
       console.log(JSON.parse(event.data))
+      let pos=JSON.parse(event.data).player.indexOf(sessionStorage.getItem("httpSessionId"))
+      console.log("Posicion 1 jugador: ",pos);
+      sessionStorage.setItem("match", event.data)
+      
+      
     }
 
     this.ws.onclose = function(){

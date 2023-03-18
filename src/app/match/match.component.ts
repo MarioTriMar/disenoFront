@@ -8,8 +8,8 @@ import { GamesService } from '../games.service';
 })
 export class MatchComponent implements OnInit {
 
-  matriz? : any
-  matriz_0? : any 
+  matriz_1? : any
+  matriz_2? : any 
 
   constructor(private gamesService:GamesService) { }
 
@@ -23,8 +23,24 @@ export class MatchComponent implements OnInit {
       sessionStorage.setItem("idMatch", respuesta.id)
       console.log(respuesta)
       this.gamesService.prepareWebSocket()
-      this.matriz=respuesta.boards[0].digits!
-      this.matriz_0=respuesta.boards[1].digits!
+      let ready=respuesta.ready;
+      
+      if(ready){
+        this.matriz_1=respuesta.boards[1].digits!
+        this.matriz_2=respuesta.boards[0].digits!
+      }else{
+        while(!ready){
+          if(sessionStorage.getItem("match")!=null){
+            ready=true;
+            console.log("Entra: ",sessionStorage.getItem("match")!)
+            this.matriz_1=JSON.parse(sessionStorage.getItem("match")!).boards[0].digits!
+            this.matriz_2=JSON.parse(sessionStorage.getItem("match")!).boards[1].digits!
+          }else{
+            console.log("no entra: ", sessionStorage.getItem("match")!)
+          }
+        }
+      }
+      
       
     }, error =>{
       console.log(error)
