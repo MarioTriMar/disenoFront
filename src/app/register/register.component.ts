@@ -28,7 +28,11 @@ export class RegisterComponent implements OnInit {
       pwd1:this.pwd1,
       pwd2:this.pwd2
     }
-    this.accountService.register(info)
+    this.accountService.register(info).subscribe(
+      respuesta =>{
+      alert(respuesta)
+      console.log(respuesta)
+    })
     this.router.navigate(['/login'])
   }
 }

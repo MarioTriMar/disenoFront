@@ -8,6 +8,8 @@ import { GamesService } from '../games.service';
 })
 export class MatchComponent implements OnInit {
 
+  private ws?: WebSocket
+
   matriz? : any
   matriz_0? : any 
 
@@ -22,7 +24,7 @@ export class MatchComponent implements OnInit {
     .subscribe(respuesta =>{
       sessionStorage.setItem("idMatch", respuesta.id)
       console.log(respuesta)
-      this.gamesService.prepareWebSocket()
+      this.prepareWebSocket()
       this.matriz=respuesta.boards[0].digits!
       this.matriz_0=respuesta.boards[1].digits!
       
@@ -32,6 +34,26 @@ export class MatchComponent implements OnInit {
     )
   }
 
+  prepareWebSocket(){
+    this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+
+      sessionStorage.getItem("httpSessionId"))
+    this.ws.onopen = function(){
+      console.log("WS abierto")
+    }
+
+    this.ws.onmessage = function(event){
+      console.log("Evento: ", event.data)
+      sessionStorage.setItem("match", event.data)
+    }
+
+    this.ws.onclose = function(){
+      console.log("WS cerrado")
+    }
+    this.ws.onerror = function(event){
+      console.log("WS error: " + JSON.stringify(event))
+    }
+    
+  }
   
 
 }
