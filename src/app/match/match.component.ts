@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { GamesService } from '../games.service';
 
 @Component({
@@ -10,8 +11,9 @@ export class MatchComponent implements OnInit {
 
   private ws?: WebSocket
 
-  matriz? : any
-  matriz_0? : any 
+  matriz_1? : any
+  matriz_2? : any
+  respuesta_ws? : string
 
   constructor(private gamesService:GamesService) { }
 
@@ -25,34 +27,50 @@ export class MatchComponent implements OnInit {
       sessionStorage.setItem("idMatch", respuesta.id)
       console.log(respuesta)
       this.prepareWebSocket()
-      this.matriz=respuesta.boards[0].digits!
-      this.matriz_0=respuesta.boards[1].digits!
-      
+    
+      this.partida_ready(respuesta);
+
+      console.log("ws ......... ",this.ws)
+
     }, error =>{
       console.log(error)
     }
     )
   }
 
-  prepareWebSocket(){
-    this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+
-      sessionStorage.getItem("httpSessionId"))
+  private partida_ready(respuesta: any) {
+    let ready = respuesta.ready;
+    if (ready) {
+      this.matriz_1 = respuesta.boards[1].digits!;
+      this.matriz_2 = respuesta.boards[0].digits!;
+    }
+  }
+
+  prepareWebSocket():WebSocket{
+    let self = this
+    this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+sessionStorage.getItem("httpSessionId"))
+
     this.ws.onopen = function(){
       console.log("WS abierto")
     }
 
     this.ws.onmessage = function(event){
-      console.log("Evento: ", event.data)
-      sessionStorage.setItem("match", event.data)
+      console.log(JSON.parse(event.data))
+      let info = event.data
+      info = JSON.parse(info)
+      self.matriz_1 = info.boards[0].digits
+      self.matriz_2 = info.boards[1].digits
     }
 
     this.ws.onclose = function(){
       console.log("WS cerrado")
     }
+
     this.ws.onerror = function(event){
       console.log("WS error: " + JSON.stringify(event))
     }
     
+    return this.ws
   }
   
 
