@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { GamesService } from '../games.service';
 
+declare let Stripe : any;
+
 @Component({
   selector: 'app-match',
   templateUrl: './match.component.html',
@@ -10,6 +12,8 @@ export class MatchComponent implements OnInit {
 
   matriz_1? : any
   matriz_2? : any 
+  token? : string
+  stripe = Stripe("pk_test_51MqBO8FClxgzl70eR7n8R66OOfIxgVuPIiaCM3AZDJBlQQmiUYISXuR0uIfOWL5TbLWOHcltJSzr3r4isyuVcBXw00Iuh8aPYv")
 
   constructor(private gamesService:GamesService) { }
 
@@ -48,6 +52,70 @@ export class MatchComponent implements OnInit {
     )
   }
 
-  
+  pay(){
+    let req=new XMLHttpRequest()
+    let self=this
+    req.open("GET", "http://localhost/payments/prepay?amount=100")
+    req.onreadystatechange = function(){
+      if(req.readyState==4){
+        if(req.status==200){
+          self.token=req.responseText
+          self.showForm()
+        }else{
+          alert(req.statusText)
+        }
+      }
+    }
+    req.send()
 
+  }
+
+  showForm(){
+    let elements = this.stripe.elements()
+    let style = {
+      base: {
+        color: "#32325d", fontFamily: 'Arial, sans-serif',
+        fontSmoothing: "antialiased", fontSize: "16px",
+        "::placeholder": {
+        color: "#32325d"
+        }
+      },
+      invalid: {
+        fontFamily: 'Arial, sans-serif', color: "#fa755a",
+        iconColor: "#fa755a"
+      }
+    }
+    let card = elements.create("card", { style : style })
+    card.mount("#card-element")
+    card.on("change", function(event : any) {
+      document.querySelector("button")!.disabled = event.empty;
+      document.querySelector("#card-error")!.textContent =
+      event.error ? event.error.message : "";
+    });
+    let self = this
+    let form = document.getElementById("payment-form");
+    form!.addEventListener("submit", function(event) {
+      event.preventDefault();
+      self.payWithCard(card);
+    });
+    form!.style.display = "block"
+  }
+
+  payWithCard(card:any){
+    let self = this
+    this.stripe.confirmCardPayment(this.token, {
+      payment_method: {
+      card: card
+      }
+    }).then(function(response : any) {
+      if (response.error) {
+        alert(response.error.message);
+      } else {
+        if (response.paymentIntent.status === 'succeeded') {
+          alert("Pago exitoso");
+        }
+      }
+    });
+
+  }
 }
