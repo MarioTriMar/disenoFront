@@ -12,10 +12,14 @@ export class MatchComponent implements OnInit {
   private ws?: WebSocket
   matriz_1? : any
   matriz_2? : any 
+  i_1?:number
+  j_1?:number
+  i_2?:number
+  j_2?:number
   respuesta_ws? : string
   token? : string
   stripe = Stripe("pk_test_51MqBO8FClxgzl70eR7n8R66OOfIxgVuPIiaCM3AZDJBlQQmiUYISXuR0uIfOWL5TbLWOHcltJSzr3r4isyuVcBXw00Iuh8aPYv")
-
+  selectedCells: {rowIndex: number, cellIndex: number}[] = [];
   constructor(private gamesService:GamesService) { }
 
   ngOnInit(): void {
@@ -38,11 +42,33 @@ export class MatchComponent implements OnInit {
     }
     )
   }
+  isRowEmpty(row: number[]): boolean {
+    return row.every(num => num === 0);
+  }
+
+  selectNumber(num: number, rowIndex: number, cellIndex: number) {
+    if (num === 0) {
+      return;
+    }
+    const cellIndexInSelectedCells = this.selectedCells.findIndex(cell => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex);
+    if (cellIndexInSelectedCells !== -1) {
+      this.selectedCells.splice(cellIndexInSelectedCells, 1);
+    } else {
+      if (this.selectedCells.length === 2) {
+        this.selectedCells = [];
+      }
+      this.selectedCells.push({rowIndex, cellIndex});
+    }
+  }
+
+  isSelected(rowIndex: number, cellIndex: number): boolean {
+    return this.selectedCells.some(cell => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex);
+  }
   private partida_ready(respuesta: any) {
     let ready = respuesta.ready;
     if (ready) {
       this.matriz_1 = respuesta.boards[1].digits!;
-      this.matriz_2 = respuesta.boards[0].digits!;
+      this.matriz_2 = respuesta.boards[0].digits!;      
     }
   }
   prepareWebSocket():WebSocket{
@@ -59,6 +85,7 @@ export class MatchComponent implements OnInit {
       info = JSON.parse(info)
       self.matriz_1 = info.boards[0].digits
       self.matriz_2 = info.boards[1].digits
+
     }
 
     this.ws.onclose = function(){
@@ -159,5 +186,241 @@ export class MatchComponent implements OnInit {
       }
     }
     req.send(JSON.stringify(payload))
+  }
+  movement(i:number,j:number, value:number){
+    
+    if(this.i_1==undefined && this.j_1==undefined){
+      this.i_1=i
+      this.j_1=j
+      
+    }else{
+      this.i_2=i
+      this.j_2=j
+      console.log("i1: "+this.i_1+" j1: "+this.j_1+" value: "+this.matriz_1[this.i_1!][this.j_1!])
+      console.log("i2: "+this.i_2+" j2: "+this.j_2+" value: "+this.matriz_1[this.i_2][this.j_2])
+      if(this.matriz_1[this.i_2][this.j_2]==this.matriz_1[this.i_1!][this.j_1!] || 
+        (this.matriz_1[this.i_2][this.j_2]+this.matriz_1[this.i_1!][this.j_1!])==10){
+        this.makeMovement(this.i_1!,this.j_1!,this.i_2,this.j_2)
+      }
+      this.i_1=undefined
+      this.i_2=undefined
+      this.j_1=undefined
+      this.j_2=undefined
+    }
+    
+    
+  }
+  makeMovement(i1:number,j1:number,i2:number,j2:number){
+    if(this.sonAdyacentes(i1,j1,i2,j2)){
+      console.log("Movimiento adyacente valido")
+    }else if(this.sonDiagonales(i1,j1,i2,j2)){
+      console.log("Movimiento diagonal valido")
+    }else if(this.sonHorizontales(i1,j1,i2,j2)){
+      console.log("Movimiento horizontal valido")
+    }else if(this.sonSerpientes(i1,j1,i2,j2)){
+      console.log("Movimiento serpiente valido")
+    }else if(this.sonVerticales(i1,j1,i2,j2)){
+      console.log("Movimiento vertical valido")
+    }else{
+      console.log("Movimiento invalido")
+    }
+  }
+  sonVerticales(i1:number,j1:number,i2:number,j2:number):boolean{
+    let movValido=false
+    if((i1!=i2) && (j1==j2)){
+      if(i1<i2){
+        let i=i1+1
+        for(i;i<i2;i++){
+          if(this.matriz_1[i][j1]!=0){
+            movValido=false
+            break
+          }
+          if(i==i2-1){
+            movValido=true
+          }
+        }
+      }else{
+        let i=i1-1
+        for(i;i>i2;i--){
+          if(this.matriz_1[i][j1]!=0){
+            movValido=false
+            break
+          }
+          if(i==i2+1){
+            movValido=true
+          }
+        }
+      }
+    }
+    return movValido
+  }
+  sonSerpientes(i1:number,j1:number,i2:number,j2:number):boolean{
+    let movValido=false
+    if((i1<i2) && (j1!=j2)){
+      let seguir=true
+      
+      let j=j1+1
+      let i=i1
+      for(i;i<=i2 && seguir;i++){
+        for(j;j<=8;j++){
+          if(i==i2 && j==j2){
+            movValido=true
+            break
+          }
+          if(this.matriz_1[i][j]!=0){
+            seguir=false
+            break
+          }
+          
+          
+        }
+        j=0
+      }
+    }else if((i1>i2) && (j1!=j2)){
+      let seguir=true
+      let i=i1
+      let j=j1-1
+      for(i;i>=i2 && seguir;i--){
+        for(j;j>=0;j--){
+          if(i==i2 && j==j2){
+            movValido=true
+            break
+          }
+          if(this.matriz_1[i][j]!=0){
+            seguir=false
+            break
+          }
+        }
+        j=8
+      }
+    }
+    return movValido
+  }
+  sonHorizontales(i1:number,j1:number,i2:number,j2:number):boolean{
+    let movValido=false
+    if(i1==i2){
+      let numEnMedio=Math.abs(j1 - j2)
+      if(j1<j2){
+        let contador=0
+        let j=j1+1
+        for(j;j<j2;j++){
+          if(this.matriz_1[i1][j]!=0){
+            break
+          }
+          contador++
+        }
+        console.log(numEnMedio)
+        if(contador==numEnMedio){
+          movValido=true
+        }
+
+      }else{
+        let contador=0
+        let j=j1-1
+        for(j;j>j2;j--){
+          if(this.matriz_1[i1][j]!=0){
+            break
+          }
+          contador++
+        }
+        if(contador==numEnMedio){
+          movValido=true
+        }
+      }
+      
+    }
+    return movValido
+    
+  }
+  sonAdyacentes(i1:number,j1:number,i2:number,j2:number):boolean{
+    const difFila = Math.abs(i1 - i2);
+    const difColumna = Math.abs(j1 - j2);
+    return (difFila === 1 && difColumna === 0) || (difFila === 0 && difColumna === 1 || difFila==1 && difColumna==1);
+  }
+  sonDiagonales(i1:number,j1:number,i2:number,j2:number):boolean{
+    const difFila = Math.abs(i1 - i2);
+    const difColumna = Math.abs(j1 - j2);
+    let movValido=false
+    if(difFila === difColumna){
+      let numPorMedio=difColumna-1
+      console.log("i1: "+i1+" j1: "+j1)
+      console.log("i2: "+i2+" j2: "+j2)
+      if(i1<i2){
+        if(j1<j2){
+          //Diagonal abajo derecha
+          let i=i1+1
+          let j=j1+1
+          let contador=0
+          /*
+          Recorrer los numeros que estan entre medias, si son igual a 0 le sumo 1 al contador.
+          */
+
+          for(j;j<j2;j++,i++){
+            if(this.matriz_1[i][j]!=0){
+              break
+            }
+            contador++
+          }
+          /*
+          Si el contador es igual a la cantidad de numeros que hay entre medias es un movimiento valido.
+          */
+          if(contador==numPorMedio){
+            movValido=true
+            
+          }
+        
+        }else if(j1>j2){
+          //Diagonal abajo izquierda
+          let i=i1+1
+          let j=j1-1
+          let contador=0
+          for(j;j>j2;j--, i++){
+            if(this.matriz_1[i][j]!=0){
+              break
+            }
+            contador++
+          }
+          if(contador==numPorMedio){
+            movValido=true
+            
+          }
+        }
+      }else{
+        if(j1<j2){
+          //diagonal arriba derecha
+          let i=i1-1
+          let j=j1+1
+          let contador=0
+          for(j;j<j2;j++, i--){
+            if(this.matriz_1[i][j]!=0){
+              break
+            }
+            contador++
+          }
+          if(contador==numPorMedio){
+            movValido=true
+            
+          }
+        }else{
+          //daigonal arriba izquierda
+          let i=i1-1
+          let j=j1-1
+          let contador=0
+          for(j;j>j2;j--,i--){
+            if(this.matriz_1[i][j]!=0){
+              break
+            }
+            contador++
+          }
+          if(contador==numPorMedio){
+            movValido=true
+            
+          }
+        }
+      }
+    
+    }
+    return movValido
+    
   }
 }

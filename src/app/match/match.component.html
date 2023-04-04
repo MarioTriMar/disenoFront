@@ -20,18 +20,29 @@
     </form>
        
 </div>
-<table class="table table-bordered border-primary table-hover">
+
+<table class="board">
     <tbody>
-        <tr *ngFor="let row of matriz_1">
-            <td *ngFor="let num of row">{{num}}</td>
-        </tr>
+        <ng-container *ngFor="let row of matriz_1; let rowIndex = index; let i=index">
+            <tr *ngIf="!isRowEmpty(row)">
+                <td *ngFor="let num of row; let cellIndex = index; let j=index" (click)="movement(i,j, num)"
+                    [ngClass]="{'selected': isSelected(rowIndex, cellIndex)}"
+                    (click)="selectNumber(num, rowIndex, cellIndex)">
+                    <span *ngIf="num !== 0">{{num}}</span>
+                </td>
+            </tr>
+        </ng-container>
     </tbody>
 </table>
 
-<table class="table table-bordered border-primary table-hover">
+<br>
+
+<table class="board">
     <tbody>
-        <tr *ngFor="let row of matriz_2">
-            <td *ngFor="let num of row">{{num}}</td>
-        </tr>
+        <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
+            <tr *ngIf="!isRowEmpty(row)">
+                <td *ngFor="let num of row">{{num}}</td>
+            </tr>
+        </ng-container>
     </tbody>
 </table>
