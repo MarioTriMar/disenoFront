@@ -113,9 +113,30 @@ export class MatchComponent implements OnInit {
       } else {
         if (response.paymentIntent.status === 'succeeded') {
           alert("Pago exitoso");
+          self.paymentOk();
+
         }
       }
     });
 
+  }
+  paymentOk(){
+    let req=new XMLHttpRequest()
+    let self=this
+    let payload={
+      token:this.token
+    }
+    req.open("POST", "http://localhost/payments/paymentOk")
+    req.setRequestHeader("Content-Type","application/json")
+    req.onreadystatechange = function(){
+      if(req.readyState==4){
+        if(req.status==200){
+          alert("Tu pago se ha completado")
+        }else{
+          alert(req.statusText)
+        }
+      }
+    }
+    req.send(JSON.stringify(payload))
   }
 }
