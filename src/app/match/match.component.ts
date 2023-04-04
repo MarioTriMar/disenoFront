@@ -9,9 +9,10 @@ declare let Stripe : any;
   styleUrls: ['./match.component.css']
 })
 export class MatchComponent implements OnInit {
-
+  private ws?: WebSocket
   matriz_1? : any
   matriz_2? : any 
+  respuesta_ws? : string
   token? : string
   stripe = Stripe("pk_test_51MqBO8FClxgzl70eR7n8R66OOfIxgVuPIiaCM3AZDJBlQQmiUYISXuR0uIfOWL5TbLWOHcltJSzr3r4isyuVcBXw00Iuh8aPYv")
 
@@ -26,31 +27,51 @@ export class MatchComponent implements OnInit {
     .subscribe(respuesta =>{
       sessionStorage.setItem("idMatch", respuesta.id)
       console.log(respuesta)
-      this.gamesService.prepareWebSocket()
-      let ready=respuesta.ready;
-      
-      if(ready){
-        this.matriz_1=respuesta.boards[1].digits!
-        this.matriz_2=respuesta.boards[0].digits!
-      }else{
-        while(!ready){
-          if(sessionStorage.getItem("match")!=null){
-            ready=true;
-            console.log("Entra: ",sessionStorage.getItem("match")!)
-            this.matriz_1=JSON.parse(sessionStorage.getItem("match")!).boards[0].digits!
-            this.matriz_2=JSON.parse(sessionStorage.getItem("match")!).boards[1].digits!
-          }else{
-            console.log("no entra: ", sessionStorage.getItem("match")!)
-          }
-        }
-      }
-      
-      
+      this.prepareWebSocket()
+    
+      this.partida_ready(respuesta);
+
+      console.log("ws ......... ",this.ws)
+
     }, error =>{
       console.log(error)
     }
     )
   }
+  private partida_ready(respuesta: any) {
+    let ready = respuesta.ready;
+    if (ready) {
+      this.matriz_1 = respuesta.boards[1].digits!;
+      this.matriz_2 = respuesta.boards[0].digits!;
+    }
+  }
+  prepareWebSocket():WebSocket{
+    let self = this
+    this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+sessionStorage.getItem("httpSessionId"))
+
+    this.ws.onopen = function(){
+      console.log("WS abierto")
+    }
+
+    this.ws.onmessage = function(event){
+      console.log(JSON.parse(event.data))
+      let info = event.data
+      info = JSON.parse(info)
+      self.matriz_1 = info.boards[0].digits
+      self.matriz_2 = info.boards[1].digits
+    }
+
+    this.ws.onclose = function(){
+      console.log("WS cerrado")
+    }
+
+    this.ws.onerror = function(event){
+      console.log("WS error: " + JSON.stringify(event))
+    }
+    
+    return this.ws
+  }
+  
 
   pay(){
     let req=new XMLHttpRequest()
