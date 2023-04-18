@@ -77,6 +77,8 @@ export class PaymentComponent implements OnInit {
       }
     }).then(function (response: any) {
       if (response.error) {
+        console.log("ERROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOR")
+        console.log(response.error)
         alert(response.error.message);
       } else {
         if (response.paymentIntent.status === 'succeeded') {

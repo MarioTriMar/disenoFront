@@ -6,11 +6,12 @@ import { PaymentComponent } from './payment/payment.component';
 import { RegisterComponent } from './register/register.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'match', component: MatchComponent },
   { path: 'payment', component: PaymentComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  
 ];
 
 @NgModule({
