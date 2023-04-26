@@ -41,8 +41,11 @@
     <tbody>
         <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
             <tr *ngIf="!isRowEmpty(row)">
-                <td *ngFor="let num of row">{{num}}</td>
+                <td *ngFor="let num of row">
+                    <ng-container *ngIf="num != 0">{{num}}</ng-container>
+                </td>
             </tr>
         </ng-container>
     </tbody>
 </table>
+

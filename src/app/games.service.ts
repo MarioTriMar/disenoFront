@@ -13,9 +13,7 @@ export class GamesService {
   constructor(private httpClient:HttpClient, private router:Router) { }
 
   requestGame(){
-
     return this.httpClient.get<any>("http://localhost:80/games/requestGame?juego=nm&player=" + sessionStorage.getItem("httpSessionId"));
-    
   }
   prepareWebSocket(){
     this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+

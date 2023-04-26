@@ -61,9 +61,11 @@ export class MatchComponent implements OnInit {
     }
   }
 
+  
   isSelected(rowIndex: number, cellIndex: number): boolean {
     return this.selectedCells.some(cell => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex);
   }
+
   private partida_ready(respuesta: any) {
     let ready = respuesta.ready;
     if (ready) {
@@ -71,6 +73,49 @@ export class MatchComponent implements OnInit {
       this.matriz_2 = respuesta.boards[0].digits!;      
     }
   }
+
+  makeMovement(i1:number,j1:number,i2:number,j2:number){
+    let valido=true
+    if(this.sonAdyacentes(i1,j1,i2,j2)){
+      console.log("Movimiento adyacente valido")
+    }else if(this.sonDiagonales(i1,j1,i2,j2)){
+      console.log("Movimiento diagonal valido")
+    }else if(this.sonHorizontales(i1,j1,i2,j2)){
+      console.log("Movimiento horizontal valido")
+    }else if(this.sonSerpientes(i1,j1,i2,j2)){
+      console.log("Movimiento serpiente valido")
+    }else if(this.sonVerticales(i1,j1,i2,j2)){
+      console.log("Movimiento vertical valido")
+    }else{
+      console.log("Movimiento invalido")
+      valido=false
+    }
+    if(valido){
+      let pos1={
+        "i1":i1,
+        "j1":j1
+      }
+      let pos2={
+        "i2":i2,
+        "j2":j2
+      }
+      let movement=[pos1,pos2]
+      let info={
+        "idPartida":sessionStorage.getItem("idMatch"),
+        "idJugador":sessionStorage.getItem("httpSessionId"),
+        "movement":movement,
+        "board":this.matriz_1
+      }
+      console.log(info)
+      this.gamesService.hacerMovimiento(info).subscribe(data=>{
+        this.matriz_1 = data.boards[1].digits!;
+        this.matriz_2 = data.boards[0].digits!; 
+      },error=>{
+        console.log(error)
+      })
+    }
+  }
+
   prepareWebSocket():WebSocket{
     let self = this
     this.ws=new WebSocket("ws://localhost/wsGames?httpSessionId="+sessionStorage.getItem("httpSessionId"))
@@ -87,12 +132,10 @@ export class MatchComponent implements OnInit {
         self.matriz_2 = info.boards[1].digits
       }else if(info.type=="movement"){
         console.log(info)
-        
-        self.matriz_2 = info.boards[1].digits
-        self.deleteZeros()
+        self.deleteZeros(info.boards[0].digits, 1)
+        self.deleteZeros(info.boards[1].digits, 2) 
       }
       
-
     }
 
     this.ws.onclose = function(){
@@ -106,19 +149,24 @@ export class MatchComponent implements OnInit {
     return this.ws
   }
 
-  deleteZeros(){
-    if (this.matriz_2.length != 0) {
+  deleteZeros(matriz: any, num:number){
+    if (matriz.length != 0) {
       // Elimina filas con ceros de la matriz
-      for (let i = this.matriz_2.length - 1; i >= 0; i--) {
-        const row = this.matriz_2[i];
+      for (let i = matriz.length - 1; i >= 0; i--) {
+        const row = matriz[i];
         const allZeros = row.every((value: number) => value === 0);
         if (allZeros) {
-          this.matriz_2.splice(i, 1);
+          matriz.splice(i, 1);
         }
       }
     }
 
-    
+    if (num == 1){
+      this.matriz_1 = matriz;
+    } else {
+      this.matriz_2 = matriz;
+    }
+
   }
 
   pay(){
@@ -208,6 +256,8 @@ export class MatchComponent implements OnInit {
     }
     req.send(JSON.stringify(payload))
   }
+
+
   movement(i:number,j:number, value:number){
     
     if(this.i_1==undefined && this.j_1==undefined){
@@ -231,46 +281,7 @@ export class MatchComponent implements OnInit {
     
     
   }
-  makeMovement(i1:number,j1:number,i2:number,j2:number){
-    let valido=true
-    if(this.sonAdyacentes(i1,j1,i2,j2)){
-      console.log("Movimiento adyacente valido")
-    }else if(this.sonDiagonales(i1,j1,i2,j2)){
-      console.log("Movimiento diagonal valido")
-    }else if(this.sonHorizontales(i1,j1,i2,j2)){
-      console.log("Movimiento horizontal valido")
-    }else if(this.sonSerpientes(i1,j1,i2,j2)){
-      console.log("Movimiento serpiente valido")
-    }else if(this.sonVerticales(i1,j1,i2,j2)){
-      console.log("Movimiento vertical valido")
-    }else{
-      console.log("Movimiento invalido")
-      valido=false
-    }
-    if(valido){
-      let pos1={
-        "i1":i1,
-        "j1":j1
-      }
-      let pos2={
-        "i2":i2,
-        "j2":j2
-      }
-      let movement=[pos1,pos2]
-      let info={
-        "idPartida":sessionStorage.getItem("idMatch"),
-        "idJugador":sessionStorage.getItem("httpSessionId"),
-        "movement":movement,
-        "board":this.matriz_1
-      }
-      console.log(info)
-      this.gamesService.hacerMovimiento(info).subscribe(data=>{
-        console.log(data)
-      },error=>{
-        console.log(error)
-      })
-    }
-  }
+  
   sonVerticales(i1:number,j1:number,i2:number,j2:number):boolean{
     let movValido=false
     if((i1!=i2) && (j1==j2)){
@@ -345,8 +356,8 @@ export class MatchComponent implements OnInit {
   sonHorizontales(i1:number,j1:number,i2:number,j2:number):boolean{
     let movValido=false
     if(i1==i2){
-      let numEnMedio=Math.abs(j1 - j2)
       if(j1<j2){
+        let numEnMedio=Math.abs(j1+1 - j2)
         let contador=0
         let j=j1+1
         for(j;j<j2;j++){
@@ -355,12 +366,13 @@ export class MatchComponent implements OnInit {
           }
           contador++
         }
-        console.log(numEnMedio)
+        console.log("Numero en medio: ", numEnMedio)
         if(contador==numEnMedio){
           movValido=true
         }
 
       }else{
+        let numEnMedio=Math.abs(j2+1 - j1)
         let contador=0
         let j=j1-1
         for(j;j>j2;j--){
@@ -369,6 +381,8 @@ export class MatchComponent implements OnInit {
           }
           contador++
         }
+        console.log("Numero en medio: ", numEnMedio)
+        console.log("Contador: ", contador)
         if(contador==numEnMedio){
           movValido=true
         }
