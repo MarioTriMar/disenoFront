@@ -80,11 +80,18 @@ export class MatchComponent implements OnInit {
     }
 
     this.ws.onmessage = function(event){
-      console.log(JSON.parse(event.data))
       let info = event.data
       info = JSON.parse(info)
-      self.matriz_1 = info.boards[0].digits
-      self.matriz_2 = info.boards[1].digits
+      if (info.type=="matchReady"){
+        self.matriz_1 = info.boards[0].digits
+        self.matriz_2 = info.boards[1].digits
+      }else if(info.type=="movement"){
+        console.log(info)
+        
+        self.matriz_2 = info.boards[1].digits
+        self.deleteZeros()
+      }
+      
 
     }
 
@@ -98,7 +105,21 @@ export class MatchComponent implements OnInit {
     
     return this.ws
   }
-  
+
+  deleteZeros(){
+    if (this.matriz_2.length != 0) {
+      // Elimina filas con ceros de la matriz
+      for (let i = this.matriz_2.length - 1; i >= 0; i--) {
+        const row = this.matriz_2[i];
+        const allZeros = row.every((value: number) => value === 0);
+        if (allZeros) {
+          this.matriz_2.splice(i, 1);
+        }
+      }
+    }
+
+    
+  }
 
   pay(){
     let req=new XMLHttpRequest()
@@ -211,6 +232,7 @@ export class MatchComponent implements OnInit {
     
   }
   makeMovement(i1:number,j1:number,i2:number,j2:number){
+    let valido=true
     if(this.sonAdyacentes(i1,j1,i2,j2)){
       console.log("Movimiento adyacente valido")
     }else if(this.sonDiagonales(i1,j1,i2,j2)){
@@ -223,6 +245,30 @@ export class MatchComponent implements OnInit {
       console.log("Movimiento vertical valido")
     }else{
       console.log("Movimiento invalido")
+      valido=false
+    }
+    if(valido){
+      let pos1={
+        "i1":i1,
+        "j1":j1
+      }
+      let pos2={
+        "i2":i2,
+        "j2":j2
+      }
+      let movement=[pos1,pos2]
+      let info={
+        "idPartida":sessionStorage.getItem("idMatch"),
+        "idJugador":sessionStorage.getItem("httpSessionId"),
+        "movement":movement,
+        "board":this.matriz_1
+      }
+      console.log(info)
+      this.gamesService.hacerMovimiento(info).subscribe(data=>{
+        console.log(data)
+      },error=>{
+        console.log(error)
+      })
     }
   }
   sonVerticales(i1:number,j1:number,i2:number,j2:number):boolean{
