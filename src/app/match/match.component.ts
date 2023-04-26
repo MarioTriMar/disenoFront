@@ -106,10 +106,10 @@ export class MatchComponent implements OnInit {
         "movement":movement,
         "board":this.matriz_1
       }
-      console.log(info)
+      
       this.gamesService.hacerMovimiento(info).subscribe(data=>{
-        this.matriz_1 = data.boards[1].digits!;
-        this.matriz_2 = data.boards[0].digits!; 
+        console.log(data)
+        this.matriz_1 = data.boards.digits!;
       },error=>{
         console.log(error)
       })
@@ -131,9 +131,8 @@ export class MatchComponent implements OnInit {
         self.matriz_1 = info.boards[0].digits
         self.matriz_2 = info.boards[1].digits
       }else if(info.type=="movement"){
-        console.log(info)
-        self.deleteZeros(info.boards[0].digits, 1)
-        self.deleteZeros(info.boards[1].digits, 2) 
+        console.log(info.boards)
+        self.deleteZeros(info.boards) 
       }
       
     }
@@ -149,24 +148,19 @@ export class MatchComponent implements OnInit {
     return this.ws
   }
 
-  deleteZeros(matriz: any, num:number){
+  deleteZeros(matriz: any){
     if (matriz.length != 0) {
       // Elimina filas con ceros de la matriz
       for (let i = matriz.length - 1; i >= 0; i--) {
         const row = matriz[i];
         const allZeros = row.every((value: number) => value === 0);
         if (allZeros) {
-          matriz.splice(i, 1);
+          this.matriz_2.splice(i, 1);
         }
       }
-    }
 
-    if (num == 1){
-      this.matriz_1 = matriz;
-    } else {
       this.matriz_2 = matriz;
     }
-
   }
 
   pay(){
