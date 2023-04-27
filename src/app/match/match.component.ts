@@ -122,8 +122,7 @@ export class MatchComponent implements OnInit {
       
       this.gamesService.hacerMovimiento(info).subscribe(data=>{
         console.log("data", data.boards.digits)
-        this.matriz_1 = data.boards.digits!;
-        //this.matriz_1 =this.deleteZeros(data.boards.digits, 1);
+        this.deleteZeros(data.boards.digits!, 1);
         console.log("*********", this.matriz_1)
       },error=>{
         console.log(error)
