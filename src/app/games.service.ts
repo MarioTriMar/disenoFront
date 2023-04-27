@@ -42,4 +42,8 @@ export class GamesService {
   hacerMovimiento(info:any){
     return this.httpClient.put<any>("http://localhost:80/games/makeMovement",info)
   }
+
+  addRow(info:any){
+    return this.httpClient.put<any>("http://localhost:80/games/addRow", info)
+  }
 }

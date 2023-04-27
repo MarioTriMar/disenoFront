@@ -24,6 +24,19 @@ export class MatchComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  addRow(){
+
+    let info={
+      "idPartida":sessionStorage.getItem("idMatch"),
+      "idJugador":sessionStorage.getItem("httpSessionId"),
+    }
+
+    this.gamesService.addRow(info).subscribe( respuesta =>{
+      console.log(respuesta);
+      this.matriz_1 = respuesta.boards.digits!;
+    })
+  }
   
   requestGame(){
     console.log(sessionStorage.getItem("player"))
@@ -108,8 +121,10 @@ export class MatchComponent implements OnInit {
       }
       
       this.gamesService.hacerMovimiento(info).subscribe(data=>{
-        console.log(data)
+        console.log("data", data.boards.digits)
         this.matriz_1 = data.boards.digits!;
+        //this.matriz_1 =this.deleteZeros(data.boards.digits, 1);
+        console.log("*********", this.matriz_1)
       },error=>{
         console.log(error)
       })
@@ -131,8 +146,11 @@ export class MatchComponent implements OnInit {
         self.matriz_1 = info.boards[0].digits
         self.matriz_2 = info.boards[1].digits
       }else if(info.type=="movement"){
+        self.deleteZeros(info.boards, 2)
+        console.log("MATRIZ CAMBIADA",info.boards)
+      }else if(info.type=="addRow"){
         console.log(info.boards)
-        self.deleteZeros(info.boards) 
+        self.matriz_2 = info.boards
       }
       
     }
@@ -148,18 +166,23 @@ export class MatchComponent implements OnInit {
     return this.ws
   }
 
-  deleteZeros(matriz: any){
+  deleteZeros(matriz: any, num: number){
     if (matriz.length != 0) {
       // Elimina filas con ceros de la matriz
       for (let i = matriz.length - 1; i >= 0; i--) {
         const row = matriz[i];
-        const allZeros = row.every((value: number) => value === 0);
+        const allZeros = row.every((value: any) => value === 0);
         if (allZeros) {
-          this.matriz_2.splice(i, 1);
+          matriz.splice(i, 1);
         }
       }
 
-      this.matriz_2 = matriz;
+      if (num == 1){
+        this.matriz_1 = matriz;
+      }else{
+        this.matriz_2 = matriz;
+      }
+      
     }
   }
 
