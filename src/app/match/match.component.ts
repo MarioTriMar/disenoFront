@@ -10,6 +10,8 @@ declare let Stripe : any;
 })
 export class MatchComponent implements OnInit {
   private ws?: WebSocket
+  perdido?:boolean
+  ganado?:boolean
   matriz_1? : any
   matriz_2? : any 
   i_1?:number
@@ -142,7 +144,7 @@ export class MatchComponent implements OnInit {
       let info = event.data
       info = JSON.parse(info)
       if (info.type=="matchReady"){
-        self.matriz_1 = info.boards[0].digits
+        self.matriz_1 = [[0,1,1,0]]
         self.matriz_2 = info.boards[1].digits
       }else if(info.type=="movement"){
         self.deleteZeros(info.boards, 2)
@@ -150,6 +152,9 @@ export class MatchComponent implements OnInit {
       }else if(info.type=="addRow"){
         console.log(info.boards)
         self.matriz_2 = info.boards
+      }else if(info.type=="perdido"){
+        self.perdido=true
+        console.log("has perdido")
       }
       
     }
@@ -183,6 +188,21 @@ export class MatchComponent implements OnInit {
       }
       
     }
+    if(this.matriz_1.length == 0){
+      this.win()
+    }
+  }
+  win() {
+    let info={
+      "idPartida":sessionStorage.getItem("idMatch"),
+      "idJugador":sessionStorage.getItem("httpSessionId")
+    }
+    this.gamesService.win(info).subscribe(data=>{
+      console.log("has ganado")
+      this.ganado=true
+    },error=>{
+      console.log(error)
+    })
   }
 
   pay(){

@@ -8,6 +8,7 @@ import { MatchComponent } from './match/match.component';
   providedIn: 'root'
 })
 export class GamesService {
+ 
 
   private ws?: WebSocket
   constructor(private httpClient:HttpClient, private router:Router) { }
@@ -42,7 +43,9 @@ export class GamesService {
   hacerMovimiento(info:any){
     return this.httpClient.put<any>("http://localhost:80/games/makeMovement",info)
   }
-
+  win(info:any) {
+    return this.httpClient.put<any>("http://localhost:80/games/win",info)
+  }
   addRow(info:any){
     return this.httpClient.put<any>("http://localhost:80/games/addRow", info)
   }
