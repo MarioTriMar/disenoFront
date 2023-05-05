@@ -1,22 +1,49 @@
-<p>match works!</p>
-
-
 <div>
     <button class="btn btn-success" (click)="requestGame()">Jugar</button>
+    <button class="btn btn-primary" (click)="pay()">Pagar 100€</button>
+    <button class="btn btn-secondary" (click)="addRow()">Añadir fila</button>
+</div>
+<div>
+    <form id="payment-form" style="display:none">
+        <div id="card-element"></div>
+        <button id="submit">
+        <div class="spinner hidden" id="spinner"></div>
+        <span id="button-text">Pay now</span>
+        </button>
+        <p id="card-error" role="alert"></p>
+        <p class="result-message hidden">
+        Payment succeeded, see the result in your
+        <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+        </p>
+    </form>
+       
 </div>
 
-<table class="table table-bordered border-primary table-hover">
+<table class="board">
     <tbody>
-        <tr *ngFor="let row of matriz">
-            <td *ngFor="let num of row">{{num}}</td>
-        </tr>
+        <ng-container *ngFor="let row of matriz_1; let rowIndex = index; let i=index">
+            <tr *ngIf="!isRowEmpty(row)">
+                <td *ngFor="let num of row; let cellIndex = index; let j=index" (click)="movement(i,j, num)"
+                    [ngClass]="{'selected': isSelected(rowIndex, cellIndex)}"
+                    (click)="selectNumber(num, rowIndex, cellIndex)">
+                    <span *ngIf="num !== 0">{{num}}</span>
+                </td>
+            </tr>
+        </ng-container>
     </tbody>
 </table>
 
-<table class="table table-bordered border-primary table-hover">
+<br>
+
+<table class="board">
     <tbody>
-        <tr *ngFor="let row of matriz_0">
-            <td *ngFor="let num of row">{{num}}</td>
-        </tr>
+        <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
+            <tr *ngIf="!isRowEmpty(row)">
+                <td *ngFor="let num of row">
+                    <ng-container *ngIf="num != 0">{{num}}</ng-container>
+                </td>
+            </tr>
+        </ng-container>
     </tbody>
 </table>
+
