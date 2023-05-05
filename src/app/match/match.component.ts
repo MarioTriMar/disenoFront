@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GamesService } from '../games.service';
+import { Router } from '@angular/router';
 
 declare let Stripe : any;
 
@@ -12,8 +13,8 @@ declare let Stripe : any;
 export class MatchComponent implements OnInit {
 
   private ws?: WebSocket
-  perdido?:boolean
-  ganado?:boolean
+  perdido = false
+  ganado = false
   matriz_1? : any
   matriz_2? : any 
   i_1?:number
@@ -25,7 +26,7 @@ export class MatchComponent implements OnInit {
   stripe = Stripe("pk_test_51MqBO8FClxgzl70eR7n8R66OOfIxgVuPIiaCM3AZDJBlQQmiUYISXuR0uIfOWL5TbLWOHcltJSzr3r4isyuVcBXw00Iuh8aPYv")
   selectedCells: {rowIndex: number, cellIndex: number}[] = [];
 
-  constructor(private gamesService:GamesService) { }
+  constructor(private gamesService:GamesService, private router:Router) { }
 
   ngOnInit(): void {
   }
@@ -144,7 +145,7 @@ export class MatchComponent implements OnInit {
       let info = event.data
       info = JSON.parse(info)
       if (info.type=="matchReady"){
-        self.matriz_1 = [[0,1,1,0]]
+        self.matriz_1 = info.boards[0].digits
         self.matriz_2 = info.boards[1].digits
       }else if(info.type=="movement"){
         self.deleteZeros(info.boards, 2)
@@ -155,8 +156,8 @@ export class MatchComponent implements OnInit {
       }else if(info.type=="perdido"){
         self.perdido=true
         console.log("has perdido")
+        self.finDelJuego()
       }
-      
     }
 
     this.ws.onclose = function(){
@@ -192,6 +193,13 @@ export class MatchComponent implements OnInit {
       this.win()
     }
   }
+
+  finDelJuego() {
+    setTimeout(() => {
+        this.router.navigate(['/inicio']);
+    }, 3000);
+  }
+
   win() {
     let info={
       "idPartida":sessionStorage.getItem("idMatch"),
@@ -200,6 +208,7 @@ export class MatchComponent implements OnInit {
     this.gamesService.win(info).subscribe(data=>{
       console.log("has ganado")
       this.ganado=true
+      this.finDelJuego()
     },error=>{
       console.log(error)
     })

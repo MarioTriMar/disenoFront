@@ -8,14 +8,16 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './login/login.component';
 import { MatchComponent } from './match/match.component';
-import { PaymentComponent } from './payment/payment.component'
+import { PaymentComponent } from './payment/payment.component';
+import { InicioComponent } from './inicio/inicio.component'
 @NgModule({
   declarations: [
     AppComponent,
     RegisterComponent,
     LoginComponent,
     MatchComponent,
-    PaymentComponent
+    PaymentComponent,
+    InicioComponent
   ],
   imports: [
     BrowserModule,
