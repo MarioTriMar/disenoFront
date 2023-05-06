@@ -12,6 +12,8 @@ declare let Stripe : any;
 })
 export class MatchComponent implements OnInit {
 
+  stateAddRow:boolean = false;
+  rowsAdded:number = 0;
   private ws?: WebSocket
   perdido = false
   ganado = false
@@ -32,16 +34,24 @@ export class MatchComponent implements OnInit {
   }
 
   addRow(){
+    if (this.rowsAdded < 3){
 
-    let info={
-      "idPartida":sessionStorage.getItem("idMatch"),
-      "idJugador":sessionStorage.getItem("httpSessionId"),
+      let info={
+        "idPartida":sessionStorage.getItem("idMatch"),
+        "idJugador":sessionStorage.getItem("httpSessionId"),
+      }
+  
+      this.gamesService.addRow(info).subscribe( respuesta =>{
+        console.log(respuesta);
+        this.matriz_1 = respuesta.boards.digits!;
+      })
+
+      this.rowsAdded++;
+
+    } else {
+      alert("Máximo de filas añadidas")
     }
 
-    this.gamesService.addRow(info).subscribe( respuesta =>{
-      console.log(respuesta);
-      this.matriz_1 = respuesta.boards.digits!;
-    })
   }
   
   requestGame(){
@@ -118,6 +128,9 @@ export class MatchComponent implements OnInit {
         "j2":j2
       }
       let movement=[pos1,pos2]
+
+      this.deleteZeros(this.matriz_1,1)
+
       let info={
         "idPartida":sessionStorage.getItem("idMatch"),
         "idJugador":sessionStorage.getItem("httpSessionId"),
@@ -125,6 +138,8 @@ export class MatchComponent implements OnInit {
         "board":this.matriz_1
       }
       
+      console.log("info makemovement", info)
+
       this.gamesService.hacerMovimiento(info).subscribe(data=>{
         this.deleteZeros(data.boards.digits!, 1);
       },error=>{
@@ -144,18 +159,18 @@ export class MatchComponent implements OnInit {
     this.ws.onmessage = function(event){
       let info = event.data
       info = JSON.parse(info)
+
+      console.log("info websocket",info)
+
       if (info.type=="matchReady"){
-        self.matriz_1 = info.boards[0].digits
-        self.matriz_2 = info.boards[1].digits
+        self.deleteZeros(info.boards[0].digits,1)
+        self.deleteZeros(info.boards[1].digits,2)
       }else if(info.type=="movement"){
         self.deleteZeros(info.boards, 2)
         console.log("MATRIZ CAMBIADA",info.boards)
       }else if(info.type=="addRow"){
-        console.log(info.boards)
         self.matriz_2 = info.boards
       }else if(info.type=="perdido"){
-        self.perdido=true
-        console.log("has perdido")
         self.finDelJuego()
       }
     }
@@ -177,21 +192,22 @@ export class MatchComponent implements OnInit {
       for (let i = matriz.length - 1; i >= 0; i--) {
         const row = matriz[i];
         const allZeros = row.every((value: any) => value === 0);
-        if (allZeros) {
+        if (allZeros) {  
           matriz.splice(i, 1);
         }
       }
+    }
 
-      if (num == 1){
-        this.matriz_1 = matriz;
-      }else{
-        this.matriz_2 = matriz;
-      }
-      
+    if (num == 1){
+      this.matriz_1 = matriz;
+    }else{
+      this.matriz_2 = matriz;
     }
-    if(this.matriz_1.length == 0){
-      this.win()
-    }
+
+    //if(this.matriz_1.length == 0){
+    //  this.win()
+    //}
+
   }
 
   finDelJuego() {
