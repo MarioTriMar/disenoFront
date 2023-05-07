@@ -9,8 +9,8 @@ import { AccountService } from '../account.service';
 })
 export class RegisterComponent implements OnInit {
 
-  name : string = "Pepe"
-  email: string
+  name?: string
+  email?: string
   pwd1?: string
   pwd2?: string
 
@@ -32,7 +32,10 @@ export class RegisterComponent implements OnInit {
       respuesta =>{
       alert(respuesta)
       console.log(respuesta)
+    },error => {
+      alert(error.error.message.substring(20,36))
     })
+    
     this.router.navigate(['/login'])
   }
 }

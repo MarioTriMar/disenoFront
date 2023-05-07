@@ -21,7 +21,7 @@ export class PaymentComponent implements OnInit {
   pay() {
     let self = this
     let req = new XMLHttpRequest()
-    req.open("GET", "http://localhost/payments/prepay?amount=100")
+    req.open("GET", "http://localhost/payments/prepay?amount=1")
     req.onreadystatechange = function () {
       if (req.readyState == 4) {
         if (req.status == 200) {
