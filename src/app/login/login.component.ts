@@ -28,10 +28,10 @@ export class LoginComponent implements OnInit {
         console.log((respuesta.httpSessionId))
         sessionStorage.setItem("httpSessionId", respuesta.httpSessionId!)
         sessionStorage.setItem("player", this.name!)
-        this.router.navigate(['/match'])
+        this.router.navigate(['/inicio'])
       },
       error=>{
-        this.message="Ha habido un error"
+        alert("Error"+ error.error.message)
       }
     )
   }
@@ -39,5 +39,6 @@ export class LoginComponent implements OnInit {
   register(){
     this.router.navigate(['/register'])
   }
+
   
 }

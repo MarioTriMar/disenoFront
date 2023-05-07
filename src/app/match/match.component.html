@@ -2,6 +2,7 @@
     <button class="btn btn-success" (click)="requestGame()">Jugar</button>
     <button class="btn btn-primary" (click)="pay()">Pagar 100€</button>
     <button class="btn btn-secondary" (click)="addRow()">Añadir fila</button>
+    <p>{{puntos}}</p>
 </div>
 <div>
     <form id="payment-form" style="display:none">
@@ -19,31 +20,38 @@
        
 </div>
 
-<table class="board">
-    <tbody>
-        <ng-container *ngFor="let row of matriz_1; let rowIndex = index; let i=index">
-            <tr *ngIf="!isRowEmpty(row)">
-                <td *ngFor="let num of row; let cellIndex = index; let j=index" (click)="movement(i,j, num)"
-                    [ngClass]="{'selected': isSelected(rowIndex, cellIndex)}"
-                    (click)="selectNumber(num, rowIndex, cellIndex)">
-                    <span *ngIf="num !== 0">{{num}}</span>
-                </td>
-            </tr>
-        </ng-container>
-    </tbody>
-</table>
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <div *ngIf="ganado" class="mensaje-ganado position-absolute p-5 text-center">HAS GANADO</div>
+    <div *ngIf="perdido" class="mensaje-perdido position-absolute p-5 text-center">HAS PERDIDO</div>
 
-<br>
+    <table class="board">
+        <tbody>
+            <ng-container *ngFor="let row of matriz_1; let rowIndex = index; let i=index">
+                <tr *ngIf="!isRowEmpty(row)">
+                    <td class="tdSelect" *ngFor="let num of row; let cellIndex = index; let j=index" (click)="movement(i,j, num)"
+                        [ngClass]="{'selected': isSelected(rowIndex, cellIndex)}"
+                        (click)="selectNumber(num, rowIndex, cellIndex)">
+                        <span *ngIf="num !== 0">{{num}}</span>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+    
+    <br>
+    
+    <table class="board">
+        <tbody>
+            <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
+                <tr *ngIf="!isRowEmpty(row)">
+                    <td class="tdNoSelect" *ngFor="let num of row">
+                        <ng-container *ngIf="num != 0">{{num}}</ng-container>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+</div>
 
-<table class="board">
-    <tbody>
-        <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
-            <tr *ngIf="!isRowEmpty(row)">
-                <td *ngFor="let num of row">
-                    <ng-container *ngIf="num != 0">{{num}}</ng-container>
-                </td>
-            </tr>
-        </ng-container>
-    </tbody>
-</table>
+
 

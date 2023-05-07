@@ -9,8 +9,8 @@ import { AccountService } from '../account.service';
 })
 export class RegisterComponent implements OnInit {
 
-  name : string = "Pepe"
-  email: string
+  name?: string
+  email?: string
   pwd1?: string
   pwd2?: string
 
@@ -28,7 +28,14 @@ export class RegisterComponent implements OnInit {
       pwd1:this.pwd1,
       pwd2:this.pwd2
     }
-    this.accountService.register(info)
+    this.accountService.register(info).subscribe(
+      respuesta =>{
+      alert(respuesta)
+      console.log(respuesta)
+    },error => {
+      alert(error.error.message.substring(20,36))
+    })
+    
     this.router.navigate(['/login'])
   }
 }

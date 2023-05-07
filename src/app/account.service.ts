@@ -10,11 +10,8 @@ export class AccountService {
 
   constructor(private httpClient:HttpClient) { }
 
-  register(info:any) {
-    this.httpClient.post("http://localhost:80/users/register",info).subscribe(respuesta =>{
-      alert(respuesta)
-      console.log(respuesta)
-    })
+  register(info:any):Observable<any>{
+   return this.httpClient.post<any>("http://localhost:80/users/register",info)
   }
   login(info:any):Observable<any>{
     return this.httpClient.put<any>("http://localhost:80/users/login",info)
