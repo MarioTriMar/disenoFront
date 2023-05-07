@@ -163,14 +163,15 @@ export class MatchComponent implements OnInit {
       console.log("info websocket",info)
 
       if (info.type=="matchReady"){
-        self.deleteZeros(info.boards[0].digits,1)
+        self.matriz_1 = [[0,1,1,0]]
+        //self.deleteZeros(info.boards[0].digits,1)
         self.deleteZeros(info.boards[1].digits,2)
       }else if(info.type=="movement"){
         self.deleteZeros(info.boards, 2)
-        console.log("MATRIZ CAMBIADA",info.boards)
       }else if(info.type=="addRow"){
         self.matriz_2 = info.boards
       }else if(info.type=="perdido"){
+        self.perdido = true
         self.finDelJuego()
       }
     }
@@ -204,9 +205,9 @@ export class MatchComponent implements OnInit {
       this.matriz_2 = matriz;
     }
 
-    //if(this.matriz_1.length == 0){
-    //  this.win()
-    //}
+    if(this.matriz_1.length == 0){
+      this.win()
+    }
 
   }
 
@@ -222,7 +223,6 @@ export class MatchComponent implements OnInit {
       "idJugador":sessionStorage.getItem("httpSessionId")
     }
     this.gamesService.win(info).subscribe(data=>{
-      console.log("has ganado")
       this.ganado=true
       this.finDelJuego()
     },error=>{
