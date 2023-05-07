@@ -71,6 +71,7 @@ export class PaymentComponent implements OnInit {
 
   payWithCard(card: any) {
     let self = this
+    this.pagoCompletado()
     this.stripe.confirmCardPayment(this.token, {
       payment_method: {
         card: card
@@ -86,5 +87,21 @@ export class PaymentComponent implements OnInit {
         }
       }
     });
+  }
+
+  pagoCompletado(){
+    let self = this
+    let req = new XMLHttpRequest()
+    req.open("PUT", "http://localhost/payments/pagoCompletado?amount=1&idPlayer="+sessionStorage.getItem("idPlayer")!)
+    req.onreadystatechange = function () {
+      if (req.readyState == 4) {
+        if (req.status == 200) {
+          console.log(req.responseText)
+        } else {
+          alert(req.statusText)
+        }
+      }
+    }
+    req.send()
   }
 }

@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class AccountService {
   
+  
 
   constructor(private httpClient:HttpClient) { }
 
@@ -15,5 +16,9 @@ export class AccountService {
   }
   login(info:any):Observable<any>{
     return this.httpClient.put<any>("http://localhost:80/users/login",info)
+  }
+  cargarUsuario() {
+    return this.httpClient.get<any>("http://localhost:80/users/cargarUsuario?idPlayer="+sessionStorage.getItem("idPlayer"));
+
   }
 }

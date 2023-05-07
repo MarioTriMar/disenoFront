@@ -160,8 +160,10 @@ export class MatchComponent implements OnInit {
       console.log("info websocket",info)
 
       if (info.type=="matchReady"){
+        console.log(info)
         self.deleteZeros(info.boards[0].digits,1, false)
         self.deleteZeros(info.boards[1].digits,2, false)
+        self.quitarFichas(info.player)
       }else if(info.type=="movement"){
         self.deleteZeros(info.boards, 2, false)
       }else if(info.type=="addRow"){
@@ -181,6 +183,13 @@ export class MatchComponent implements OnInit {
     }
     
     return this.ws
+  }
+  quitarFichas(players: any) {
+    this.gamesService.quitarFichas().subscribe(data=>{
+      console.log(data)
+    },error=>{
+      console.log(error)
+    })
   }
 
   deleteZeros(matriz: any, num: number, puntua:boolean){
