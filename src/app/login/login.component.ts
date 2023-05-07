@@ -25,9 +25,11 @@ export class LoginComponent implements OnInit {
     this.accountService.login(info).subscribe(
       respuesta => {
         this.message="Hola, "+ this.name
-        console.log((respuesta.httpSessionId))
+        console.log((respuesta))
         sessionStorage.setItem("httpSessionId", respuesta.httpSessionId!)
         sessionStorage.setItem("player", this.name!)
+        sessionStorage.setItem("idPlayer", respuesta.user.id)
+        
         this.router.navigate(['/inicio'])
       },
       error=>{
