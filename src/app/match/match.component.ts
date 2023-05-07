@@ -12,6 +12,7 @@ declare let Stripe : any;
 })
 export class MatchComponent implements OnInit {
 
+  puntos:number = 0;
   stateAddRow:boolean = false;
   rowsAdded:number = 0;
   private ws?: WebSocket
@@ -31,6 +32,7 @@ export class MatchComponent implements OnInit {
   constructor(private gamesService:GamesService, private router:Router) { }
 
   ngOnInit(): void {
+    this.requestGame();
   }
 
   addRow(){
@@ -64,8 +66,6 @@ export class MatchComponent implements OnInit {
     
       this.partida_ready(respuesta);
 
-      console.log("ws ......... ",this.ws)
-
     }, error =>{
       console.log(error)
     }
@@ -97,25 +97,24 @@ export class MatchComponent implements OnInit {
   private partida_ready(respuesta: any) {
     let ready = respuesta.ready;
     if (ready) {
-      this.matriz_1 = respuesta.boards[1].digits!;
-      this.matriz_2 = respuesta.boards[0].digits!;      
+      this.deleteZeros(respuesta.boards[1].digits!,1, false)
+      this.deleteZeros(respuesta.boards[0].digits!,2, false)      
     }
   }
 
   makeMovement(i1:number,j1:number,i2:number,j2:number){
     let valido=true
     if(this.sonAdyacentes(i1,j1,i2,j2)){
-      console.log("Movimiento adyacente valido")
+      this.puntos++;
     }else if(this.sonDiagonales(i1,j1,i2,j2)){
-      console.log("Movimiento diagonal valido")
+      this.puntos = this.puntos + 4;
     }else if(this.sonHorizontales(i1,j1,i2,j2)){
-      console.log("Movimiento horizontal valido")
+      this.puntos = this.puntos + 4;
     }else if(this.sonSerpientes(i1,j1,i2,j2)){
-      console.log("Movimiento serpiente valido")
+      //Sumamos en el método sonSerpientes
     }else if(this.sonVerticales(i1,j1,i2,j2)){
-      console.log("Movimiento vertical valido")
+      this.puntos = this.puntos + 4;
     }else{
-      console.log("Movimiento invalido")
       valido=false
     }
     if(valido){
@@ -129,8 +128,6 @@ export class MatchComponent implements OnInit {
       }
       let movement=[pos1,pos2]
 
-      this.deleteZeros(this.matriz_1,1)
-
       let info={
         "idPartida":sessionStorage.getItem("idMatch"),
         "idJugador":sessionStorage.getItem("httpSessionId"),
@@ -141,7 +138,7 @@ export class MatchComponent implements OnInit {
       console.log("info makemovement", info)
 
       this.gamesService.hacerMovimiento(info).subscribe(data=>{
-        this.deleteZeros(data.boards.digits!, 1);
+        this.deleteZeros(data.boards.digits!, 1, true);
       },error=>{
         console.log(error)
       })
@@ -163,11 +160,10 @@ export class MatchComponent implements OnInit {
       console.log("info websocket",info)
 
       if (info.type=="matchReady"){
-        self.matriz_1 = [[0,1,1,0]]
-        //self.deleteZeros(info.boards[0].digits,1)
-        self.deleteZeros(info.boards[1].digits,2)
+        self.deleteZeros(info.boards[0].digits,1, false)
+        self.deleteZeros(info.boards[1].digits,2, false)
       }else if(info.type=="movement"){
-        self.deleteZeros(info.boards, 2)
+        self.deleteZeros(info.boards, 2, false)
       }else if(info.type=="addRow"){
         self.matriz_2 = info.boards
       }else if(info.type=="perdido"){
@@ -187,13 +183,16 @@ export class MatchComponent implements OnInit {
     return this.ws
   }
 
-  deleteZeros(matriz: any, num: number){
+  deleteZeros(matriz: any, num: number, puntua:boolean){
     if (matriz.length != 0) {
       // Elimina filas con ceros de la matriz
       for (let i = matriz.length - 1; i >= 0; i--) {
         const row = matriz[i];
         const allZeros = row.every((value: any) => value === 0);
         if (allZeros) {  
+          if (puntua){
+            this.puntos = this.puntos +10;
+          }
           matriz.splice(i, 1);
         }
       }
@@ -206,6 +205,7 @@ export class MatchComponent implements OnInit {
     }
 
     if(this.matriz_1.length == 0){
+      this.puntos = this.puntos + 150;
       this.win()
     }
 
@@ -374,6 +374,7 @@ export class MatchComponent implements OnInit {
   }
   sonSerpientes(i1:number,j1:number,i2:number,j2:number):boolean{
     let movValido=false
+    let contador=0;
     if((i1<i2) && (j1!=j2)){
       let seguir=true
       
@@ -383,14 +384,19 @@ export class MatchComponent implements OnInit {
         for(j;j<=8;j++){
           if(i==i2 && j==j2){
             movValido=true
+            if(contador>0){
+              this.puntos = this.puntos + 4;
+            }else{
+              this.puntos = this.puntos + 2;
+            }
             break
           }
           if(this.matriz_1[i][j]!=0){
             seguir=false
             break
+          } else {
+            contador++;
           }
-          
-          
         }
         j=0
       }
@@ -402,11 +408,18 @@ export class MatchComponent implements OnInit {
         for(j;j>=0;j--){
           if(i==i2 && j==j2){
             movValido=true
+            if(contador>0){
+              this.puntos = this.puntos + 4;
+            }else{
+              this.puntos = this.puntos + 2;
+            }
             break
           }
           if(this.matriz_1[i][j]!=0){
             seguir=false
             break
+          } else {
+            contador++;
           }
         }
         j=8
