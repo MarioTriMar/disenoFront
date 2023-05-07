@@ -10,9 +10,7 @@ declare let Stripe : any;
   styleUrls: ['./match.component.css']
 })
 export class MatchComponent implements OnInit {
-
-
-  waitingRoom: Boolean = false;
+  ready:boolean = false;
   puntos:number = 0;
   stateAddRow:boolean = false;
   rowsAdded:number = 0;
@@ -79,9 +77,7 @@ export class MatchComponent implements OnInit {
     .subscribe(respuesta =>{
       sessionStorage.setItem("idMatch", respuesta.id)
       console.log(respuesta)
-      this.waitingRoom = true
       this.prepareWebSocket()
-    
       this.partida_ready(respuesta);
 
     }, error =>{
@@ -113,8 +109,8 @@ export class MatchComponent implements OnInit {
   }
 
   private partida_ready(respuesta: any) {
-    let ready = respuesta.ready;
-    if (ready) {
+    this.ready = respuesta.ready;
+    if (this.ready) {
       this.deleteZeros(respuesta.boards[1].digits!,1, false)
       this.deleteZeros(respuesta.boards[0].digits!,2, false)      
     }
@@ -179,6 +175,7 @@ export class MatchComponent implements OnInit {
 
       if (info.type=="matchReady"){
         console.log(info)
+        self.ready = true
         self.deleteZeros(info.boards[0].digits,1, false)
         self.deleteZeros(info.boards[1].digits,2, false)
         self.quitarFichas(info.player)

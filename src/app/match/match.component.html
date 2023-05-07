@@ -1,10 +1,10 @@
-<div *ngIf="waitingRoom">
+<div *ngIf="ready">
     <button class="btn btn-primary" (click)="addRow()">Añadir fila</button>
     <button class="btn btn-danger" (click)="rendirse()">Rendirse</button>
     <h3>Puntuación:{{puntos}}</h3>
 </div>
 
-<div *ngIf="!waitingRoom" class="col-6 mx-auto">
+<div *ngIf="!ready" class="col-6 mx-auto">
     <button class="btn btn-primary btn-lg" type="button" disabled>
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         Buscando partida...
