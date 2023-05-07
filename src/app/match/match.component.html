@@ -1,21 +1,14 @@
-<div>
-    <button class="btn btn-secondary" (click)="addRow()">Añadir fila</button>
+<div *ngIf="waitingRoom">
+    <button class="btn btn-primary" (click)="addRow()">Añadir fila</button>
+    <button class="btn btn-danger" (click)="rendirse()">Rendirse</button>
     <h3>Puntuación:{{puntos}}</h3>
 </div>
-<div>
-    <form id="payment-form" style="display:none">
-        <div id="card-element"></div>
-        <button id="submit">
-        <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Pay now</span>
-        </button>
-        <p id="card-error" role="alert"></p>
-        <p class="result-message hidden">
-        Payment succeeded, see the result in your
-        <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
-        </p>
-    </form>
-       
+
+<div *ngIf="!waitingRoom" class="col-6 mx-auto">
+    <button class="btn btn-primary btn-lg" type="button" disabled>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Buscando partida...
+    </button>
 </div>
 
 <div class="d-flex flex-column justify-content-center align-items-center">

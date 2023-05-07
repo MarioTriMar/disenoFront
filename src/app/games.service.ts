@@ -21,5 +21,8 @@ export class GamesService {
   addRow(info:any){
     return this.httpClient.put<any>("http://localhost:80/games/addRow", info)
   }
+  rendirse(info:any){
+    return this.httpClient.put<any>("http://localhost:80/games/rendirse", info)
+  }
   
 }

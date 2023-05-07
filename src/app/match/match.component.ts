@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
 import { GamesService } from '../games.service';
 import { Router } from '@angular/router';
 
@@ -12,6 +11,8 @@ declare let Stripe : any;
 })
 export class MatchComponent implements OnInit {
 
+
+  waitingRoom: Boolean = false;
   puntos:number = 0;
   stateAddRow:boolean = false;
   rowsAdded:number = 0;
@@ -55,6 +56,22 @@ export class MatchComponent implements OnInit {
     }
 
   }
+
+  rendirse(){
+    this.perdido=true
+
+    let info = {
+      "idPartida":sessionStorage.getItem("idMatch"),
+      "idJugador":sessionStorage.getItem("httpSessionId")
+    }
+
+    this.gamesService.rendirse(info).subscribe(respuesta =>{
+
+    }, error => {
+
+    })
+    this.finDelJuego()
+  }
   
   requestGame(){
     console.log(sessionStorage.getItem("player"))
@@ -62,6 +79,7 @@ export class MatchComponent implements OnInit {
     .subscribe(respuesta =>{
       sessionStorage.setItem("idMatch", respuesta.id)
       console.log(respuesta)
+      this.waitingRoom = true
       this.prepareWebSocket()
     
       this.partida_ready(respuesta);
@@ -168,6 +186,9 @@ export class MatchComponent implements OnInit {
         self.matriz_2 = info.boards
       }else if(info.type=="perdido"){
         self.perdido = true
+        self.finDelJuego()
+      }else if(info.type=="ganado"){
+        self.ganado = true
         self.finDelJuego()
       }
     }
