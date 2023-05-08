@@ -64,9 +64,9 @@ export class MatchComponent implements OnInit {
     }
 
     this.gamesService.rendirse(info).subscribe(respuesta =>{
-
+      console.log(respuesta)
     }, error => {
-
+      console.log(error)
     })
     this.finDelJuego()
   }

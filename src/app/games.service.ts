@@ -23,7 +23,7 @@ export class GamesService {
     return this.httpClient.put<any>("http://localhost:80/games/addRow", info)
   }
   rendirse(info:any){
-    return this.httpClient.put<any>("http://localhost:80/games/rendirse", info)
+    return this.httpClient.post<any>("http://localhost:80/games/rendirse", info)
   }
   quitarFichas() {
     return this.httpClient.put<any>("http://localhost:80/games/quitarFichas",sessionStorage.getItem("idMatch"))
