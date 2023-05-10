@@ -1,7 +1,9 @@
-<div *ngIf="ready">
-    <button class="btn btn-primary" (click)="addRow()">Añadir fila</button>
-    <button class="btn btn-danger" (click)="rendirse()">Rendirse</button>
-    <h3>Puntuación:{{puntos}}</h3>
+<div *ngIf="ready" class="d-flex flex-column align-items-center">
+    <h3 class="puntos">Puntuación: {{puntos}}</h3>
+    <div class="botones">
+        <button class="btn btn-primary boton-anadir" (click)="addRow()">Añadir fila</button>
+        <button class="btn btn-danger boton-rendirse" (click)="rendirse()">Rendirse</button>
+    </div>
 </div>
 
 <div *ngIf="!ready" class="col-6 mx-auto">
@@ -11,38 +13,34 @@
     </button>
 </div>
 
-<div class="d-flex flex-column justify-content-center align-items-center">
-    <div *ngIf="ganado" class="mensaje-ganado position-absolute p-5 text-center">HAS GANADO</div>
-    <div *ngIf="perdido" class="mensaje-perdido position-absolute p-5 text-center">HAS PERDIDO</div>
-
-    <table class="board">
-        <tbody>
-            <ng-container *ngFor="let row of matriz_1; let rowIndex = index; let i=index">
-                <tr *ngIf="!isRowEmpty(row)">
-                    <td class="tdSelect" *ngFor="let num of row; let cellIndex = index; let j=index" (click)="movement(i,j, num)"
-                        [ngClass]="{'selected': isSelected(rowIndex, cellIndex)}"
-                        (click)="selectNumber(num, rowIndex, cellIndex)">
-                        <span *ngIf="num !== 0">{{num}}</span>
-                    </td>
-                </tr>
-            </ng-container>
-        </tbody>
-    </table>
-    
-    <br>
-    
-    <table class="board">
-        <tbody>
-            <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
-                <tr *ngIf="!isRowEmpty(row)">
-                    <td class="tdNoSelect" *ngFor="let num of row">
-                        <ng-container *ngIf="num != 0">{{num}}</ng-container>
-                    </td>
-                </tr>
-            </ng-container>
-        </tbody>
-    </table>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="table-container">
+        <div *ngIf="ganado" class="mensaje-ganado position-absolute p-5 text-center">HAS GANADO</div>
+        <div *ngIf="perdido" class="mensaje-perdido position-absolute p-5 text-center">HAS PERDIDO</div>
+        <table class="board board-left">
+            <tbody>
+                <ng-container *ngFor="let row of matriz_1; let rowIndex = index; let i=index">
+                    <tr *ngIf="!isRowEmpty(row)">
+                        <td class="tdSelect" *ngFor="let num of row; let cellIndex = index; let j=index" (click)="movement(i,j, num)"
+                            [ngClass]="{'selected': isSelected(rowIndex, cellIndex)}"
+                            (click)="selectNumber(num, rowIndex, cellIndex)">
+                            <span *ngIf="num !== 0">{{num}}</span>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+        
+        <table class="board board-right">
+            <tbody>
+                <ng-container *ngFor="let row of matriz_2; let rowIndex = index">
+                    <tr *ngIf="!isRowEmpty(row)">
+                        <td class="tdNoSelect" *ngFor="let num of row">
+                            <ng-container *ngIf="num != 0">{{num}}</ng-container>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
 </div>
-
-
-

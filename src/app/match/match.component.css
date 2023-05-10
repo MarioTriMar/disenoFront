@@ -58,3 +58,50 @@
   padding: 20px; /* Espacio interno */
 }
 
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-left {
+  margin-right: 10px;
+}
+
+.puntos {
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.botones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.boton-anadir {
+  margin-right: 10px;
+}
+
+.boton-rendirse {
+  margin-left: 10px;
+}
+
+.mensaje-ganado,
+.mensaje-perdido {
+  backdrop-filter: blur(8px);
+}
