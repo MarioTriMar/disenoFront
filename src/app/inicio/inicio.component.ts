@@ -11,7 +11,11 @@ export class InicioComponent implements OnInit {
   usuario:any
   constructor(private router:Router, private userService:AccountService) { }
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
+    if (sessionStorage.getItem("httpSessionId") == null) {
+      this.router.navigate(["/"])
+    }
+
     this.cargarUsuario()
   }
 

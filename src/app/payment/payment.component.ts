@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 declare let Stripe: any;
 
@@ -12,9 +13,12 @@ export class PaymentComponent implements OnInit {
   stripe = Stripe("pk_test_51MqB8XKhg9Z0Z1gk68sTt0VD6hXQWe654Ag0kEZjqtLqBEHYJlUaBl8dohhqFpmC7jmjm91P4QJyucc0FGIx7JpI007oMRBLzx");
   token: any;
   
-  constructor() { }
+  constructor(private router:Router) { }
 
   ngOnInit(): void {
+    if (sessionStorage.getItem("httpSessionId") == null) {
+      this.router.navigate(["/"])
+    }
   }
 
   

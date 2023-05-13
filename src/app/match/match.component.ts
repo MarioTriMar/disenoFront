@@ -31,6 +31,9 @@ export class MatchComponent implements OnInit {
   constructor(private gamesService:GamesService, private router:Router) { }
 
   ngOnInit(): void {
+    if (sessionStorage.getItem("httpSessionId") == null) {
+      this.router.navigate(["/"])
+    }
     this.requestGame();
   }
 

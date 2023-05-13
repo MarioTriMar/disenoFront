@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   constructor(private router:Router, private accountService : AccountService, private gamesService:GamesService) { }
 
   ngOnInit(): void {
+    sessionStorage.clear()
   }
   login(){
     let info={
